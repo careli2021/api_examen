@@ -1,0 +1,107 @@
+[
+  {
+    "id": 1,
+    "nombre": "O - Laptop Lenovo",
+    "precio": 6800,
+    "stock": 98,
+    "estadoStock": "OK"
+  },
+  {
+    "id": 2,
+    "nombre": "R - Mouse Logitech",
+    "precio": 80,
+    "stock": 30,
+    "estadoStock": "OK"
+  },
+  {
+    "id": 3,
+    "nombre": "L - Teclado Mecánico",
+    "precio": 180,
+    "stock": 2,
+    "estadoStock": "INSUFICIENTE"
+  },
+  {
+    "id": 4,
+    "nombre": "A - Monitor Samsung 24",
+    "precio": 650,
+    "stock": 5,
+    "estadoStock": "OK"
+  },
+  {
+    "id": 5,
+    "nombre": "Impresora Epson EcoTank",
+    "precio": 950,
+    "stock": 12,
+    "estadoStock": "OK"
+  },
+  {
+    "id": 6,
+    "nombre": "Disco SSD Kingston 1TB",
+    "precio": 320,
+    "stock": 18,
+    "estadoStock": "OK"
+  },
+  {
+    "id": 7,
+    "nombre": "Memoria RAM DDR4 16GB",
+    "precio": 180,
+    "stock": 4,
+    "estadoStock": "INSUFICIENTE"
+  },
+  {
+    "id": 8,
+    "nombre": "Audífonos Sony Bluetooth",
+    "precio": 240,
+    "stock": 20,
+    "estadoStock": "OK"
+  },
+  {
+    "id": 9,
+    "nombre": "Webcam Logitech HD",
+    "precio": 210,
+    "stock": 3,
+    "estadoStock": "INSUFICIENTE"
+  },
+  {
+    "id": 10,
+    "nombre": "Router TP-Link WiFi 6",
+    "precio": 290,
+    "stock": 9,
+    "estadoStock": "OK"
+  },
+  {
+    "id": 11,
+    "nombre": "Tablet Samsung Galaxy",
+    "precio": 1200,
+    "stock": 7,
+    "estadoStock": "OK"
+  },
+  {
+    "id": 12,
+    "nombre": "Disco Externo Seagate 2TB",
+    "precio": 390,
+    "stock": 0,
+    "estadoStock": "INSUFICIENTE"
+  },
+  {
+    "id": 13,
+    "nombre": "USB SanDisk 64GB",
+    "precio": 45,
+    "stock": 50,
+    "estadoStock": "OK"
+  },
+  {
+    "id": 14,
+    "nombre": "Silla Ergonómica de Oficina",
+    "precio": 560,
+    "stock": 6,
+    "estadoStock": "OK"
+  },
+  {
+    "id": 15,
+    "nombre": "Adaptador USB-C Multipuerto",
+    "precio": 125,
+    "stock": 1,
+    "estadoStock": "INSUFICIENTE"
+  }
+]
