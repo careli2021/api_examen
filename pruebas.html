@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Evaluación de JavaScript | UTP</title>
+  <style>
+    :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#182339;background:#f4f6fb}*{box-sizing:border-box}body{margin:0;padding:24px 12px}.wrap{max-width:780px;margin:auto;background:white;border-radius:16px;padding:28px;box-shadow:0 10px 35px #1d315011}h1{font-size:1.6rem;margin:0 0 5px}p{line-height:1.55}.small{color:#526075;font-size:.94rem}.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:600px){.row{grid-template-columns:1fr}}label{display:block;font-weight:600;margin:15px 0 5px}input[type=text]{width:100%;border:1px solid #bdc8da;border-radius:8px;padding:12px;font-size:1rem}.timer{font-weight:800;font-variant-numeric:tabular-nums;font-size:1.3rem;color:#204ba0}.timer.urgent{color:#b91c1c}.question{padding:16px 0;border-top:1px solid #e2e7f0}.question h2{font-size:1.03rem;line-height:1.4}.option{display:flex;gap:10px;align-items:flex-start;padding:7px 4px;font-weight:400;margin:0;cursor:pointer}.option input{margin-top:4px}button{background:#1546a0;color:white;border:0;border-radius:9px;padding:13px 20px;font-size:1rem;font-weight:700;cursor:pointer}button:disabled{opacity:.55;cursor:default}.notice{padding:14px;border-radius:9px;background:#eef3fc;margin-top:16px}.warning{background:#fff5e8}.hidden{display:none}code{background:#edf1f8;padding:2px 4px;border-radius:4px}
+  </style>
+</head>
+<body><main class="wrap">
+  <h1>Evaluación de JavaScript — UTP</h1>
+  <p class="small">Prueba de funcionamiento · 5 preguntas · 5 minutos · 4 puntos por respuesta correcta. Se permite volver a rendir la evaluación; cada intento debería guardarse como una fila independiente.</p>
+  <section id="startScreen">
+    <div class="row">
+      <div><label for="codigo">Código de estudiante</label><input id="codigo" type="text" maxlength="40" autocomplete="off" required placeholder="Ej. U20260001"></div>
+      <div><label for="nombre">Nombres y apellidos</label><input id="nombre" type="text" maxlength="120" autocomplete="name" required placeholder="Nombre completo"></div>
+    </div>
+    <p class="small">El cronómetro comienza al pulsar «Comenzar evaluación». Al agotarse el tiempo, se envían las respuestas seleccionadas.</p>
+    <button id="begin" type="button">Comenzar evaluación</button>
+  </section>
+  <section id="examScreen" class="hidden">
+    <p>Tiempo restante: <span id="timer" class="timer">05:00</span></p>
+    <form id="exam" novalidate></form>
+    <button id="send" type="button">Terminar y enviar respuestas</button>
+  </section>
+  <section id="resultScreen" class="hidden" aria-live="polite"></section>
+</main>
+<script>
+'use strict';
+// IMPORTANTE: mantener este arreglo y sus claves sincronizados con PREGUNTAS en Código.gs.
+const ENDPOINT = 'https://script.google.com/macros/s/AKfycbz37fOJuV41zc6Kv5248M1exZ64LoQIaW-dyoGtvqJQzJJKEwsd04NZ7szvFvkBJEpA/exec';
+const DURATION_SEC = 5 * 60;
+const QUESTIONS = [
+ {q:'¿Cuál palabra clave permite declarar una variable que puede reasignarse en JavaScript?', options:['A. const','B. let','C. static','D. final'],correct:'B'},
+ {q:'¿Qué método convierte una cadena JSON válida en un objeto JavaScript?', options:['A. JSON.parse()','B. JSON.stringify()','C. JSON.convert()','D. JSON.object()'],correct:'A'},
+ {q:'¿Qué operador compara valor y tipo sin conversión implícita?', options:['A. =','B. ==','C. ===','D. !='],correct:'C'},
+ {q:'¿Cuál método agrega un elemento al final de un arreglo?', options:['A. shift()','B. unshift()','C. pop()','D. push()'],correct:'D'},
+ {q:'¿Qué devuelve typeof "hola"?', options:['A. "text"','B. "string"','C. "char"','D. "object"'],correct:'B'}
+];
+const $ = id => document.getElementById(id);
+let student=null, deadline=0, interval=null, finished=false, sending=false;
+function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+$('begin').onclick=()=>{
+ const codigo=$('codigo').value.trim(),nombre=$('nombre').value.trim();
+ if(!codigo||!nombre){alert('Ingresa tu código y tu nombre completo.');return;}
+ student={codigo,nombre}; $('startScreen').classList.add('hidden');$('examScreen').classList.remove('hidden');
+ $('exam').innerHTML=QUESTIONS.map((x,i)=>`<div class="question"><h2>${i+1}. ${esc(x.q)}</h2>${x.options.map((o,j)=>`<label class="option"><input type="radio" name="q${i}" value="${'ABCD'[j]}"><span>${esc(o)}</span></label>`).join('')}</div>`).join('');
+ deadline=Date.now()+DURATION_SEC*1000; tick();interval=setInterval(tick,250);
+};
+function tick(){if(finished)return;let left=Math.max(0,Math.ceil((deadline-Date.now())/1000)); $('timer').textContent=`${String(Math.floor(left/60)).padStart(2,'0')}:${String(left%60).padStart(2,'0')}`;$('timer').classList.toggle('urgent',left<=60);if(left===0)submit(true);}
+$('send').onclick=()=>submit(false);
+async function submit(expired){
+ if(finished||sending)return;
+ const respuestas=QUESTIONS.map((_,i)=>document.querySelector(`input[name=q${i}]:checked`)?.value||'');
+ if(!expired && respuestas.includes('') && !confirm('Hay preguntas sin responder. ¿Deseas entregar de todas maneras?'))return;
+ finished=true;sending=true;clearInterval(interval);$('send').disabled=true;
+ const aciertos=respuestas.filter((r,i)=>r===QUESTIONS[i].correct).length;
+ const nota=aciertos*20/QUESTIONS.length;
+ $('examScreen').classList.add('hidden');$('resultScreen').classList.remove('hidden');
+ $('resultScreen').innerHTML=`<h2>Evaluación finalizada${expired?' (tiempo agotado)':''}</h2><p><strong>${esc(student.nombre)}</strong> — ${esc(student.codigo)}</p><p>Calificación calculada en este navegador: <strong>${nota} / 20</strong> (${aciertos} aciertos de ${QUESTIONS.length}).</p><p id="saveState" class="notice">Enviando intento…</p>`;
+ // text/plain evita una solicitud CORS preflight; no-cors no permite leer respuesta ni confirmar guardado.
+ // Confirmar en Google Sheets: una fila nueva con código, fecha/hora y nota.
+ try{
+   await fetch(ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({...student,respuestas})});
+   $('saveState').textContent='Solicitud enviada. IMPORTANTE: el navegador no puede confirmar que Google Sheets haya guardado este intento. El docente debe comprobarlo en la pestaña Resultados.';
+ }catch(err){
+   $('saveState').classList.add('warning');$('saveState').textContent='No se pudo enviar la solicitud. Avisa al docente y conserva el código y la nota que aparecen arriba. Error de conexión: '+err.message;
+ }
+ sending=false;
+}
+// Evitar perder respuestas por salir accidentalmente mientras el examen está en curso.
+window.addEventListener('beforeunload',e=>{if(student&&!finished){e.preventDefault();e.returnValue='';}});
+</script></body></html>
